@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Contracts;
-using Impl.Model;
-using Impl.Test.Random;
-using Impl.Test.TestData;
-using NUnit.Framework;
-using NUnit.Util;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Impl.Test
 {
-    [TestFixture]
+    [TestClass]
     public partial class SolverTest
     {
         #region Wrong Puzzle Constants
@@ -64,7 +57,7 @@ namespace Impl.Test
 
         #endregion
 
-        [Test]
+        [TestMethod]
         public void Solve_Handles_Wrong_Small_Table()
         {
             // Arrange
@@ -73,10 +66,10 @@ namespace Impl.Test
 
             // Act
             var result = solver.Solve(puzzle);
-            Assert.That(result, Is.Null);
+            Assert.IsNull(result);
         }
 
-        [Test]
+        [TestMethod]
         public void Solve_Handles_Wrong_Mid_Table()
         {
             // Arrange
@@ -85,10 +78,10 @@ namespace Impl.Test
 
             // Act
             var result = solver.Solve(puzzle);
-            Assert.That(result, Is.Null);
+            Assert.IsNull(result);
         }
 
-        [Test]
+        [TestMethod]
         public void Solve_Handles_Wrong_Large_Table()
         {
             // Arrange
@@ -97,7 +90,7 @@ namespace Impl.Test
 
             // Act
             var result = solver.Solve(puzzle);
-            Assert.That(result, Is.Null);
+            Assert.IsNull(result);
         }
     }
 }

@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Contracts">
@@ -46,6 +47,7 @@
     <Compile Include="Extensions\TableMapping.cs" />
     <Compile Include="Model\Table.cs" />
     <Compile Include="ParallelSolver.cs" />
+    <Compile Include="StackSolver.cs" />
     <Compile Include="Solver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Contracts;
-using Impl.Extensions;
+﻿using Contracts;
 using Impl.Model;
 
 namespace Impl
 {
-    public class Solver : ISolver
+    internal class Solver : ISolver
     {
         private Table Solve2(Table table)
         {

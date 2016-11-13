@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Contracts;
 using Impl.Model;
 using Impl.Test.Random;
 using Impl.Test.TestData;
-using NUnit.Framework;
-using NUnit.Util;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Impl.Test
 {
-    [TestFixture]
     public partial class SolverTest
     {
         #region Puzzle Constants
@@ -62,54 +61,121 @@ namespace Impl.Test
    3     1##     ## # #  
 # #  1#     # 3       1 #";
 
+        const string Puzzle_25x25_Challenging = @"   ##  ## 2     #   1 2  
+ #    #   #  #  ### #  # 
+2 ##      #  ## ## 1  #  
+    ### 2### # #      # #
+2#  #    #          ##  #
+  0  # # # # 0#  # # #   
+ #      ###     ##   # # 
+ ##  ## 1  #  0 #  #    #
+###   ##   #  #  0#  0  #
+   #          2   ####   
+  #  # 1#1 # 1    #  ###0
+ ### 1    1# ## ## # #   
+                         
+   # # ## ## #1    1 ### 
+1###  #    2 # 0#1 #  #  
+   ####   1          #   
+#  2  #2  #  #   ##   ###
+#    #  # 0  #  2 ##  ## 
+ # #   ##     ###      # 
+   # # #  #2 # # # #  2  
+#  ##          #    #  #1
+# #      # # ###1 ###    
+  #  1 ## ##  #      ## 2
+ #  # ###  #  #   #    # 
+  2 2   #     1 ##  ##   ";
+
         #endregion
 
         private const int TimeoutShort = 5000;
-        private const int TimeoutLong = 60000;
+        private const int TimeoutLong = 25000;
 
-        [Test]
+        [TestMethod]
+        [Ignore]
+        public void GeneratePuzzles()
+        {            
+            var testDataFactory = new TestDataFactory(new ParallelSolver(), new RngRandomProvider());
+
+            var sizes = new[] { 70, 100, 120, 200 };
+            const int count = 20;
+
+            foreach (var size in sizes)
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    var puzzle = testDataFactory.GenerateRandomPuzzle(size, size * 16, 0.3);
+
+                    string time = DateTime.UtcNow.ToString("hhmmss");
+                    string directory = $@"c:\Temp\Puzzles\{size}\{time}";
+
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    string path = $@"{directory}\{i}.txt";
+                    File.WriteAllText(path, puzzle);
+                }
+            }
+        }
+
+        [TestMethod]
+        [Timeout(TimeoutShort)]
+        public void Solve_Challenging_Table_25x25()
+        {
+            // Arrange
+            var puzzle = Puzzle_25x25_Challenging;
+            var solver = CreateSolver();
+
+            // Act
+            RunTestWithSinglePuzzle(solver, puzzle);
+        }
+
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Small_Table()
         {
             // Arrange
             var puzzle = PuzzleSmall;
-            var solver = new Solver();
+            var solver = CreateSolver();
 
             // Act
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Mid_Table()
         {
             // Arrange
             var puzzle = PuzzleMiddle;
-            var solver = new Solver();
+            var solver = CreateSolver();
 
             // Act
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Large_Table()
         {
             // Arrange
             var puzzle = PuzzleLarge;
-            var solver = new Solver();
+            var solver = CreateSolver();
 
             // Act
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
         public void Solve_Small_Replaced_Puzzles()
         {
             // Arrange
             var puzzle = PuzzleSmall;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
             var testDataFactory = new TestDataFactory(new Solver(), random);
             var puzzles = testDataFactory.TransformByReplace(puzzle);
@@ -118,13 +184,13 @@ namespace Impl.Test
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
         public void Solve_Mid_Replaced_Puzzles()
         {
             // Arrange
             var puzzle = PuzzleMiddle;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
             var testDataFactory = new TestDataFactory(new Solver(), random);
 
@@ -134,13 +200,13 @@ namespace Impl.Test
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
         public void Solve_Large_Replaced_Puzzles()
         {
             // Arrange
             var puzzle = PuzzleLarge;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
             var testDataFactory = new TestDataFactory(new Solver(), random);
 
@@ -150,13 +216,13 @@ namespace Impl.Test
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
         public void Solve_Small_Rotated_Puzzles()
         {
             // Arrange
             var puzzle = PuzzleSmall;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
             var testDataFactory = new TestDataFactory(new Solver(), random);
 
@@ -166,13 +232,13 @@ namespace Impl.Test
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
         public void Solve_Mid_Rotated_Puzzles()
         {
             // Arrange
             var puzzle = PuzzleMiddle;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
             var testDataFactory = new TestDataFactory(new Solver(), random);
 
@@ -182,13 +248,13 @@ namespace Impl.Test
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
         public void Solve_Large_Rotated_Puzzles()
         {
             // Arrange
             var puzzle = PuzzleLarge;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
             var testDataFactory = new TestDataFactory(new Solver(), random);
 
@@ -198,160 +264,184 @@ namespace Impl.Test
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Random_Puzzle_20x20()
         {
             // Arrange
             const int size = 20;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
-            var testDataFactory = new TestDataFactory(new Solver(), random);
+            var testDataFactory = new TestDataFactory(solver, random);
 
             var puzzle = testDataFactory.GenerateRandomPuzzle(size);
 
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Random_Puzzle_40x40()
         {
             // Arrange
             const int size = 40;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
-            var testDataFactory = new TestDataFactory(new Solver(), random);
+            var testDataFactory = new TestDataFactory(solver, random);
 
             var puzzle = testDataFactory.GenerateRandomPuzzle(size);
 
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Random_Puzzle_60x60()
         {
             // Arrange
             const int size = 60;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
-            var testDataFactory = new TestDataFactory(new Solver(), random);
+            var testDataFactory = new TestDataFactory(solver, random);
 
             var puzzle = testDataFactory.GenerateRandomPuzzle(size);
 
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Random_Puzzle_80x80()
         {
             // Arrange
             const int size = 80;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
-            var testDataFactory = new TestDataFactory(new Solver(), random);
+            var testDataFactory = new TestDataFactory(solver, random);
 
             var puzzle = testDataFactory.GenerateRandomPuzzle(size);
 
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutShort)]
         public void Solve_Random_Puzzle_100x100()
         {
             // Arrange
             const int size = 100;
-            var solver = new Solver();
+            var solver = CreateSolver();
             var random = new RngRandomProvider();
-            var testDataFactory = new TestDataFactory(new Solver(), random);
+            var testDataFactory = new TestDataFactory(solver, random);
 
             var puzzle = testDataFactory.GenerateRandomPuzzle(size);
 
             RunTestWithSinglePuzzle(solver, puzzle);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
-        public void Solve_WellKnown_Puzzle_14x14()
+        public void Solve_Random_Puzzle_200x200()
         {
             // Arrange
-            var solver = new Solver();
+            const int size = 200;
+            var solver = CreateSolver();
+            var random = new RngRandomProvider();
+            var testDataFactory = new TestDataFactory(solver, random);
+
+            var puzzle = testDataFactory.GenerateRandomPuzzle(size);
+
+            RunTestWithSinglePuzzle(solver, puzzle);
+        }
+
+        [TestMethod]
+        [Timeout(TimeoutLong)]
+        public void Solve_WellKnown_Puzzles_14x14()
+        {
+            // Arrange
+            var solver = CreateSolver();
             var puzzles = WellKnownPuzzles.Puzzles_14x14;
 
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
-        public void Solve_WellKnown_Puzzle_20x20()
+        public void Solve_WellKnown_Puzzles_20x20()
         {
             // Arrange
-            var solver = new Solver();
+            var solver = CreateSolver();
             var puzzles = WellKnownPuzzles.Puzzles_20x20;
 
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
-        public void Solve_WellKnown_Puzzle_25x25()
+        public void Solve_WellKnown_Puzzles_25x25()
         {
             // Arrange
-            var solver = new Solver();
+            var solver = CreateSolver();
             var puzzles = WellKnownPuzzles.Puzzles_25x25;
 
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
-        public void Solve_WellKnown_Puzzle_30x30()
+        public void Solve_WellKnown_Puzzles_30x30()
         {
             // Arrange
-            var solver = new Solver();
+            var solver = CreateSolver();
             var puzzles = WellKnownPuzzles.Puzzles_30x30;
 
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
-        public void Solve_WellKnown_Puzzle_40x40()
+        public void Solve_WellKnown_Puzzles_40x40()
         {
             // Arrange
-            var solver = new Solver();
+            var solver = CreateSolver();
             var puzzles = WellKnownPuzzles.Puzzles_40x40;
 
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
-        [Test]
+        [TestMethod]
         [Timeout(TimeoutLong)]
-        public void Solve_WellKnown_Puzzle_70x70()
+        public void Solve_WellKnown_Puzzles_70x70()
         {
             // Arrange
-            var solver = new Solver();
+            var solver = CreateSolver();
             var puzzles = WellKnownPuzzles.Puzzles_70x70;
 
             RunTestWithMultiplePuzzles(solver, puzzles);
         }
 
+        public ISolver CreateSolver()
+        {
+            return new ParallelSolver();
+        }
+
         private void RunTestWithSinglePuzzle(ISolver solver, string puzzle)
         {
+            Console.WriteLine(string.Empty.PadLeft(50, '*'));
+            Console.WriteLine("Puzzle:\n{0}", puzzle.Replace(' ', '-'));
+
             string result;
             using (new TestActionScope())
             {
                 result = solver.Solve(puzzle);
-                if (result != null)
-                    Console.WriteLine("Result:\n{0}", result.Replace(' ', 'x'));
             }
 
-            Assert.That(result, Is.Not.Null);
+            if (result != null)
+                Console.WriteLine("Result:\n{0}", result);
+
+            Assert.IsNotNull(result);
             var table = new Table(result);
-            Assert.That(table.IsCorrect());
+            Assert.IsTrue(table.IsCorrect());
         }
 
         private void RunTestWithMultiplePuzzles(ISolver solver, IEnumerable<string> puzzles)
